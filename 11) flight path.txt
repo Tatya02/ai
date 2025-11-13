@@ -1,0 +1,106 @@
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+struct Node {
+    int dest;
+    int cost;
+    Node* next;
+
+    Node(int d, int c) {
+        dest = d;
+        cost = c;
+        next = nullptr;
+    }
+};
+
+const int MAX = 20;
+vector<Node*> adjList(MAX);
+vector<bool> visited(MAX);
+vector<string> cities(MAX);
+int n;
+
+// Function to add an edge to the graph
+void addEdge(int src, int dest, int cost) {
+    Node* newNode = new Node(dest, cost);
+    newNode->next = adjList[src];
+    adjList[src] = newNode;
+
+    // Since flights are two-way, add reverse edge
+    newNode = new Node(src, cost);
+    newNode->next = adjList[dest];
+    adjList[dest] = newNode;
+}
+
+// DFS traversal to check connectivity
+void DFS(int v) {
+    visited[v] = true;
+    Node* temp = adjList[v];
+    while (temp != nullptr) {
+        if (!visited[temp->dest])
+            DFS(temp->dest);
+        temp = temp->next;
+    }
+}
+
+// Function to check if graph is connected
+bool isConnected() {
+    fill(visited.begin(), visited.begin() + n, false);
+
+    DFS(0);  // Start DFS from the first city
+
+    for (int i = 0; i < n; i++) {
+        if (!visited[i])
+            return false;
+    }
+    return true;
+}
+
+// Function to display adjacency list
+void displayGraph() {
+    cout << "\n--- Flight Path Graph (Adjacency List) ---\n";
+    for (int i = 0; i < n; i++) {
+        cout << cities[i] << " -> ";
+        Node* temp = adjList[i];
+        while (temp != nullptr) {
+            cout << cities[temp->dest] << "(cost:" << temp->cost << ") ";
+            temp = temp->next;
+        }
+        cout << "\n";
+    }
+}
+
+int main() {
+    int e, src, dest, cost;
+    cout << "✈  Flight Path Connectivity Program ✈\n";
+
+    cout << "\nEnter number of cities: ";
+    cin >> n;
+
+    cout << "Enter city names:\n";
+    for (int i = 0; i < n; i++) {
+        cout << "City " << i << ": ";
+        cin >> cities[i];
+        adjList[i] = nullptr;
+    }
+
+    cout << "\nEnter number of flight paths: ";
+    cin >> e;
+
+    cout << "Enter source, destination (as index) and cost (time/fuel):\n";
+    for (int i = 0; i < e; i++) {
+        cout << "Edge " << i + 1 << " (src dest cost): ";
+        cin >> src >> dest >> cost;
+        addEdge(src, dest, cost);
+    }
+
+    displayGraph();
+
+    if (isConnected())
+        cout << "\n✅ The flight network is CONNECTED — all cities are reachable.\n";
+    else
+        cout << "\n❌ The flight network is NOT connected — some cities are isolated.\n";
+
+    return 0;
+}

@@ -1,0 +1,166 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Structure to store member info
+struct Node {
+    int prn;
+    char name[50];
+    struct Node* next;
+};
+
+// Head and tail pointers
+struct Node* head = NULL;  // President
+struct Node* tail = NULL;  // Secretary
+
+// Function to create a new node
+struct Node* createNode(int prn, char name[]) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->prn = prn;
+    strcpy(newNode->name, name);
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Add president (at beginning)
+void addPresident(int prn, char name[]) {
+    if (head != NULL) {
+        printf("⚠ President already exists!\n");
+        return;
+    }
+    struct Node* newNode = createNode(prn, name);
+    head = tail = newNode;
+    printf("✅ President added: %s (PRN: %d)\n", name, prn);
+}
+
+// Add secretary (at end)
+void addSecretary(int prn, char name[]) {
+    if (head == NULL) {
+        printf("⚠ Add president first!\n");
+        return;
+    }
+    if (tail != NULL && tail != head && tail->next == NULL) {
+        // already has secretary
+        printf("⚠ Secretary already exists!\n");
+        return;
+    }
+    struct Node* newNode = createNode(prn, name);
+    tail->next = newNode;
+    tail = newNode;
+    printf("✅ Secretary added: %s (PRN: %d)\n", name, prn);
+}
+
+// Add member (between president and secretary)
+void addMember(int prn, char name[]) {
+    if (head == NULL) {
+        printf("⚠ Add president first!\n");
+        return;
+    }
+    struct Node* newNode = createNode(prn, name);
+
+    // if only president exists
+    if (head == tail) {
+        head->next = newNode;
+        tail = newNode;
+    } else {
+        struct Node* temp = head;
+        while (temp->next != tail && temp->next != NULL)
+            temp = temp->next;
+        newNode->next = temp->next;
+        temp->next = newNode;
+    }
+
+    printf("✅ Member added: %s (PRN: %d)\n", name, prn);
+}
+
+// Display club members
+void display() {
+    if (head == NULL) {
+        printf("⚠ No members in club.\n");
+        return;
+    }
+    struct Node* temp = head;
+    printf("\n--- Pinnacle Club Members ---\n");
+    while (temp != NULL) {
+        if (temp == head)
+            printf("👑 President: %s (PRN: %d)\n", temp->name, temp->prn);
+        else if (temp == tail)
+            printf("📜 Secretary: %s (PRN: %d)\n", temp->name, temp->prn);
+        else
+            printf("👥 Member: %s (PRN: %d)\n", temp->name, temp->prn);
+        temp = temp->next;
+    }
+}
+
+// Count total members
+void totalMembers() {
+    int count = 0;
+    struct Node* temp = head;
+    while (temp != NULL) {
+        count++;
+        temp = temp->next;
+    }
+    printf("\n👥 Total members (including President & Secretary): %d\n", count);
+}
+
+int main() {
+    int choice, prn;
+    char name[50];
+
+    printf("🏫 Pinnacle Club Membership Management System 🏫\n");
+
+    do {
+        printf("\n--- MENU ---\n");
+        printf("1. Add President\n");
+        printf("2. Add Member\n");
+        printf("3. Add Secretary\n");
+        printf("4. Display Members\n");
+        printf("5. Count Total Members\n");
+        printf("6. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+        case 1:
+            printf("Enter President PRN: ");
+            scanf("%d", &prn);
+            printf("Enter President Name: ");
+            scanf("%s", name);
+            addPresident(prn, name);
+            break;
+
+        case 2:
+            printf("Enter Member PRN: ");
+            scanf("%d", &prn);
+            printf("Enter Member Name: ");
+            scanf("%s", name);
+            addMember(prn, name);
+            break;
+
+        case 3:
+            printf("Enter Secretary PRN: ");
+            scanf("%d", &prn);
+            printf("Enter Secretary Name: ");
+            scanf("%s", name);
+            addSecretary(prn, name);
+            break;
+
+        case 4:
+            display();
+            break;
+
+        case 5:
+            totalMembers();
+            break;
+
+        case 6:
+            printf("Exiting program...\n");
+            break;
+
+        default:
+            printf("❌ Invalid choice! Try again.\n");
+        }
+    } while (choice != 6);
+
+    return 0;
+}

@@ -1,0 +1,137 @@
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+
+#define SIZE 10  // Hash table size
+
+// Structure to store client information
+struct Client {
+    string name;
+    long long phone;
+    bool occupied;
+
+    Client() {
+        name = "";
+        phone = 0;
+        occupied = false;
+    }
+};
+
+// Hash Table
+vector<Client> hashTable(SIZE);
+
+// Primary hash function
+int hash1(const string &key) {
+    int sum = 0;
+    for (char ch : key)
+        sum += ch;
+    return sum % SIZE;
+}
+
+// Secondary hash function (must not be 0)
+int hash2(const string &key) {
+    int sum = 0;
+    for (char ch : key)
+        sum += ch;
+    return 7 - (sum % 7); // 7 chosen smaller prime
+}
+
+// Function to insert a client into the hash table
+void insertClient(const string &name, long long phone) {
+    int index = hash1(name);
+    int step = hash2(name);
+    int i = 0;
+
+    // Try to find an empty slot using double hashing
+    while (hashTable[(index + i * step) % SIZE].occupied && i < SIZE)
+        i++;
+
+    if (i == SIZE) {
+        cout << "⚠ Hash Table Full! Cannot insert " << name << ".\n";
+        return;
+    }
+
+    index = (index + i * step) % SIZE;
+    hashTable[index].name = name;
+    hashTable[index].phone = phone;
+    hashTable[index].occupied = true;
+
+    cout << "✅ Inserted: " << name << " -> " << phone << "\n";
+}
+
+// Function to search a client by name
+void searchClient(const string &name) {
+    int index = hash1(name);
+    int step = hash2(name);
+    int i = 0;
+
+    while (hashTable[(index + i * step) % SIZE].occupied && i < SIZE) {
+        int pos = (index + i * step) % SIZE;
+        if (hashTable[pos].name == name) {
+            cout << "📞 Found: " << hashTable[pos].name << " -> " << hashTable[pos].phone << "\n";
+            return;
+        }
+        i++;
+    }
+
+    cout << "❌ Client '" << name << "' not found.\n";
+}
+
+// Function to display the hash table
+void displayTable() {
+    cout << "\n--- Telephone Book Hash Table ---\n";
+    for (int i = 0; i < SIZE; i++) {
+        if (hashTable[i].occupied)
+            cout << "[" << i << "] " << hashTable[i].name << " -> " << hashTable[i].phone << "\n";
+        else
+            cout << "[" << i << "] --- Empty ---\n";
+    }
+}
+
+int main() {
+    int choice;
+    string name;
+    long long phone;
+
+    cout << "📖 Telephone Book using Double Hashing 📖\n";
+
+    do {
+        cout << "\n--- MENU ---\n";
+        cout << "1. Insert Client\n";
+        cout << "2. Search Client\n";
+        cout << "3. Display Hash Table\n";
+        cout << "4. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+        case 1:
+            cout << "Enter client name: ";
+            cin >> name;
+            cout << "Enter phone number: ";
+            cin >> phone;
+            insertClient(name, phone);
+            break;
+
+        case 2:
+            cout << "Enter client name to search: ";
+            cin >> name;
+            searchClient(name);
+            break;
+
+        case 3:
+            displayTable();
+            break;
+
+        case 4:
+            cout << "Exiting...\n";
+            break;
+
+        default:
+            cout << "Invalid choice! Try again.\n";
+        }
+    } while (choice != 4);
+
+    return 0;
+}

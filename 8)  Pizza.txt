@@ -1,0 +1,110 @@
+#include <iostream>
+using namespace std;
+
+#define MAX 5  // Maximum number of orders that can be accepted
+
+int queueArr[MAX];
+int front = -1, rear = -1;
+
+// Function to check if the queue is full
+bool isFull() {
+    return (front == (rear + 1) % MAX);
+}
+
+// Function to check if the queue is empty
+bool isEmpty() {
+    return (front == -1);
+}
+
+// Function to add a job (enqueue)
+void addJob(int orderID) {
+    if (isFull()) {
+        cout << "🍕 Pizza parlor full! Cannot accept more orders." << endl;
+        return;
+    }
+
+    if (front == -1)  // First order
+        front = 0;
+
+    rear = (rear + 1) % MAX;
+    queueArr[rear] = orderID;
+
+    cout << "✅ Order " << orderID << " added to the queue." << endl;
+}
+
+// Function to delete a job (dequeue)
+void serveJob() {
+    if (isEmpty()) {
+        cout << "⚠️ No orders to serve." << endl;
+        return;
+    }
+
+    cout << "🍽️ Order " << queueArr[front] << " is served." << endl;
+
+    if (front == rear) {
+        // Queue becomes empty
+        front = rear = -1;
+    } else {
+        front = (front + 1) % MAX;
+    }
+}
+
+// Function to display all jobs in the queue
+void displayQueue() {
+    if (isEmpty()) {
+        cout << "⚠️ No pending orders." << endl;
+        return;
+    }
+
+    cout << "\n📋 Pending Orders: ";
+    int i = front;
+    while (true) {
+        cout << queueArr[i] << " ";
+        if (i == rear)
+            break;
+        i = (i + 1) % MAX;
+    }
+    cout << endl;
+}
+
+int main() {
+    int choice, orderID;
+
+    cout << "🍕 Welcome to Pizza Parlor Ordering System 🍕" << endl;
+
+    do {
+        cout << "\n--- MENU ---\n";
+        cout << "1. Add Order\n";
+        cout << "2. Serve Order\n";
+        cout << "3. Display Pending Orders\n";
+        cout << "4. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                cout << "Enter Order ID: ";
+                cin >> orderID;
+                addJob(orderID);
+                break;
+
+            case 2:
+                serveJob();
+                break;
+
+            case 3:
+                displayQueue();
+                break;
+
+            case 4:
+                cout << "Exiting... Thank you! 🍕" << endl;
+                break;
+
+            default:
+                cout << "Invalid choice! Try again." << endl;
+        }
+
+    } while (choice != 4);
+
+    return 0;
+}

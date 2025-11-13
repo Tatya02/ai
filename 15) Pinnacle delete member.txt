@@ -1,0 +1,215 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+// Node structure for club members
+struct Node {
+    string name;
+    long long prn;
+    Node *next;
+};
+
+// Class for Pinnacle Club
+class PinnacleClub {
+    Node *head;
+
+public:
+    PinnacleClub() { head = NULL; }
+
+    // Function to add President (at beginning)
+    void addPresident(long long prn, string name) {
+        Node *temp = new Node;
+        temp->prn = prn;
+        temp->name = name;
+        temp->next = head;
+        head = temp;
+        cout << "✅ President added successfully.\n";
+    }
+
+    // Function to add Secretary (at end)
+    void addSecretary(long long prn, string name) {
+        Node *temp = new Node;
+        temp->prn = prn;
+        temp->name = name;
+        temp->next = NULL;
+
+        if (head == NULL) {
+            head = temp;
+        } else {
+            Node *p = head;
+            while (p->next != NULL)
+                p = p->next;
+            p->next = temp;
+        }
+        cout << "✅ Secretary added successfully.\n";
+    }
+
+    // Function to add Member (between President and Secretary)
+    void addMember(long long prn, string name) {
+        if (head == NULL) {
+            cout << "⚠ Please add the President first!\n";
+            return;
+        }
+
+        Node *temp = new Node;
+        temp->prn = prn;
+        temp->name = name;
+        temp->next = NULL;
+
+        Node *p = head;
+
+        // Insert before Secretary
+        while (p->next != NULL && p->next->next != NULL)
+            p = p->next;
+
+        temp->next = p->next;
+        p->next = temp;
+
+        cout << "✅ Member added successfully.\n";
+    }
+
+    // Function to delete a member by PRN
+    void deleteMember(long long prn) {
+        if (head == NULL) {
+            cout << "⚠ Club is empty.\n";
+            return;
+        }
+
+        Node *temp = head;
+
+        // Deleting President
+        if (head->prn == prn) {
+            head = head->next;
+            delete temp;
+            cout << "🗑 President deleted successfully.\n";
+            return;
+        }
+
+        Node *prev = NULL;
+        while (temp != NULL && temp->prn != prn) {
+            prev = temp;
+            temp = temp->next;
+        }
+
+        if (temp == NULL) {
+            cout << "❌ Member not found.\n";
+            return;
+        }
+
+        prev->next = temp->next;
+        delete temp;
+
+        if (prev->next == NULL)
+            cout << "🗑 Secretary deleted successfully.\n";
+        else
+            cout << "🗑 Member deleted successfully.\n";
+    }
+
+    // Function to display all members
+    void display() {
+        if (head == NULL) {
+            cout << "⚠ Club has no members.\n";
+            return;
+        }
+
+        Node *p = head;
+        cout << "\n--- Pinnacle Club Members ---\n";
+        while (p != NULL) {
+            if (p == head)
+                cout << "👑 [President] ";
+            else if (p->next == NULL)
+                cout << "📜 [Secretary] ";
+            else
+                cout << "👥 [Member] ";
+            cout << "PRN: " << p->prn << " | Name: " << p->name << endl;
+            p = p->next;
+        }
+    }
+
+    // Function to concatenate another division’s list
+    void concatenate(PinnacleClub &other) {
+        if (head == NULL) {
+            head = other.head;
+            return;
+        }
+
+        Node *p = head;
+        while (p->next != NULL)
+            p = p->next;
+        p->next = other.head;
+
+        cout << "\n✅ Two divisions concatenated successfully.\n";
+    }
+};
+
+// ---------------------- Main Function ----------------------
+int main() {
+    PinnacleClub divA, divB;
+    int choice;
+    long long prn;
+    string name;
+
+    cout << "\n🏫 --- Pinnacle Club Management System --- 🏫\n";
+
+    do {
+        cout << "\n--- MENU ---\n";
+        cout << "1. Add President\n";
+        cout << "2. Add Member\n";
+        cout << "3. Add Secretary\n";
+        cout << "4. Delete Member\n";
+        cout << "5. Display Members\n";
+        cout << "6. Concatenate Two Divisions\n";
+        cout << "7. Exit\n";
+        cout << "Enter choice: ";
+        cin >> choice;
+
+        switch (choice) {
+        case 1:
+            cout << "Enter PRN and Name: ";
+            cin >> prn >> name;
+            divA.addPresident(prn, name);
+            break;
+
+        case 2:
+            cout << "Enter PRN and Name: ";
+            cin >> prn >> name;
+            divA.addMember(prn, name);
+            break;
+
+        case 3:
+            cout << "Enter PRN and Name: ";
+            cin >> prn >> name;
+            divA.addSecretary(prn, name);
+            break;
+
+        case 4:
+            cout << "Enter PRN to delete: ";
+            cin >> prn;
+            divA.deleteMember(prn);
+            break;
+
+        case 5:
+            divA.display();
+            break;
+
+        case 6:
+            cout << "\nCreating Division B for concatenation...\n";
+            divB.addPresident(2001, "Rohit");
+            divB.addMember(2002, "Sneha");
+            divB.addSecretary(2003, "Meena");
+            divA.concatenate(divB);
+            divA.display();
+            break;
+
+        case 7:
+            cout << "🚪 Exiting program...\n";
+            break;
+
+        default:
+            cout << "❌ Invalid choice! Please try again.\n";
+        }
+
+    } while (choice != 7);
+
+    return 0;
+}

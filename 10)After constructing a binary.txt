@@ -1,0 +1,129 @@
+#include <iostream>
+using namespace std;
+
+// Structure for a tree node
+struct Node {
+    int data;
+    Node *left, *right;
+
+    Node(int value) {
+        data = value;
+        left = right = nullptr;
+    }
+};
+
+// Function to insert a new node into BST
+Node* insert(Node* root, int value) {
+    if (root == nullptr)
+        return new Node(value);
+
+    if (value < root->data)
+        root->left = insert(root->left, value);
+    else if (value > root->data)
+        root->right = insert(root->right, value);
+
+    return root;
+}
+
+// Function for inorder traversal (sorted order)
+void inorder(Node* root) {
+    if (root != nullptr) {
+        inorder(root->left);
+        cout << root->data << " ";
+        inorder(root->right);
+    }
+}
+
+// Function to mirror the tree (swap left and right)
+void mirror(Node* root) {
+    if (root == nullptr)
+        return;
+
+    // Swap left and right children
+    Node* temp = root->left;
+    root->left = root->right;
+    root->right = temp;
+
+    // Recursively mirror the subtrees
+    mirror(root->left);
+    mirror(root->right);
+}
+
+// Function to search for a value in BST
+Node* search(Node* root, int key) {
+    if (root == nullptr || root->data == key)
+        return root;
+
+    if (key < root->data)
+        return search(root->left, key);
+    else
+        return search(root->right, key);
+}
+
+// Main function
+int main() {
+    Node* root = nullptr;
+    int n, val, choice;
+
+    cout << "🌳 Binary Search Tree Operations 🌳\n";
+    cout << "\nEnter number of initial nodes to insert: ";
+    cin >> n;
+
+    cout << "Enter " << n << " values: ";
+    for (int i = 0; i < n; i++) {
+        cin >> val;
+        root = insert(root, val);
+    }
+
+    do {
+        cout << "\n--- MENU ---\n";
+        cout << "1. Insert new node\n";
+        cout << "2. Display inorder traversal\n";
+        cout << "3. Mirror the tree (swap left & right)\n";
+        cout << "4. Search for a value\n";
+        cout << "5. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+        case 1:
+            cout << "Enter value to insert: ";
+            cin >> val;
+            root = insert(root, val);
+            cout << "✅ Node inserted successfully.\n";
+            break;
+
+        case 2:
+            cout << "Inorder Traversal of BST: ";
+            inorder(root);
+            cout << "\n";
+            break;
+
+        case 3:
+            mirror(root);
+            cout << "🌲 The tree has been mirrored successfully!\n";
+            cout << "Inorder traversal after mirroring: ";
+            inorder(root);
+            cout << "\n";
+            break;
+
+        case 4:
+            cout << "Enter value to search: ";
+            cin >> val;
+            if (search(root, val))
+                cout << "🔍 Value " << val << " found in the tree.\n";
+            else
+                cout << "❌ Value " << val << " not found in the tree.\n";
+            break;
+
+        case 5:
+            cout << "Exiting program...\n";
+            break;
+
+        default:
+            cout << "Invalid choice! Try again.\n";
+        }
+    } while (choice != 5);
+
+    return 0;
+}

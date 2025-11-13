@@ -1,0 +1,123 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define SIZE 10   // Size of the hash table
+
+// Structure to store client information
+struct Client {
+    char name[30];
+    long long phone;
+};
+
+struct Client hashTable[SIZE];
+int flag[SIZE]; // 0 = empty, 1 = occupied
+
+// Hash function
+int hash(char *key) {
+    int sum = 0;
+    for (int i = 0; key[i] != '\0'; i++)
+        sum += key[i];
+    return sum % SIZE;
+}
+
+// Function to insert client record using quadratic probing
+void insert(char *name, long long phone) {
+    int index = hash(name);
+    int i = 0;
+
+    while (flag[(index + i * i) % SIZE] == 1 && i < SIZE) {
+        i++;
+    }
+
+    if (i == SIZE) {
+        printf("⚠ Hash Table Full! Cannot insert %s.\n", name);
+        return;
+    }
+
+    index = (index + i * i) % SIZE;
+    strcpy(hashTable[index].name, name);
+    hashTable[index].phone = phone;
+    flag[index] = 1;
+
+    printf("✅ Inserted: %s -> %lld\n", name, phone);
+}
+
+// Function to search for a client
+void search(char *name) {
+    int index = hash(name);
+    int i = 0;
+
+    while (flag[(index + i * i) % SIZE] != 0 && i < SIZE) {
+        int pos = (index + i * i) % SIZE;
+        if (strcmp(hashTable[pos].name, name) == 0) {
+            printf("📞 Found: %s -> %lld\n", hashTable[pos].name, hashTable[pos].phone);
+            return;
+        }
+        i++;
+    }
+
+    printf("❌ Client '%s' not found.\n", name);
+}
+
+// Function to display hash table
+void display() {
+    printf("\n--- Telephone Book (Quadratic Probing) ---\n");
+    for (int i = 0; i < SIZE; i++) {
+        if (flag[i])
+            printf("[%d] %s -> %lld\n", i, hashTable[i].name, hashTable[i].phone);
+        else
+            printf("[%d] --- Empty ---\n", i);
+    }
+}
+
+int main() {
+    int choice;
+    char name[30];
+    long long phone;
+
+    for (int i = 0; i < SIZE; i++)
+        flag[i] = 0; // initialize table as empty
+
+    printf("📖 Telephone Book using Quadratic Probing 📖\n");
+
+    do {
+        printf("\n--- MENU ---\n");
+        printf("1. Insert Client\n");
+        printf("2. Search Client\n");
+        printf("3. Display Hash Table\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+        case 1:
+            printf("Enter client name: ");
+            scanf("%s", name);
+            printf("Enter phone number: ");
+            scanf("%lld", &phone);
+            insert(name, phone);
+            break;
+
+        case 2:
+            printf("Enter client name to search: ");
+            scanf("%s", name);
+            search(name);
+            break;
+
+        case 3:
+            display();
+            break;
+
+        case 4:
+            printf("Exiting program...\n");
+            break;
+
+        default:
+            printf("Invalid choice! Try again.\n");
+        }
+
+    } while (choice != 4);
+
+    return 0;
+}
