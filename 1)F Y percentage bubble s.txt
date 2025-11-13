@@ -1,0 +1,43 @@
+#include <iostream>
+using namespace std;
+
+void bubbleSort(float arr[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                // Swap elements
+                float temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+}
+
+int main() {
+    int n;
+    cout << "Enter number of students: ";
+    cin >> n;
+
+    float percent[n];
+    cout << "Enter percentage of each student:\n";
+    for (int i = 0; i < n; i++) {
+        cin >> percent[i];
+    }
+
+    bubbleSort(percent, n);
+
+    cout << "\nPercentages in ascending order:\n";
+    for (int i = 0; i < n; i++) {
+        cout << percent[i] << " ";
+    }
+
+    cout << "\n\nTop five scores:\n";
+    int count = (n < 5) ? n : 5; // handle if less than 5 students
+    for (int i = n - 1; i >= n - count; i--) {
+        cout << percent[i] << " ";
+    }
+
+    cout << endl;
+    return 0;
+}

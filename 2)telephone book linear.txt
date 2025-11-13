@@ -1,0 +1,124 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+#define SIZE 10   // Size of hash table
+
+struct Client {
+    string name;
+    long long phone;
+};
+
+Client hashTable[SIZE];
+
+// Initialize hash table
+void initTable() {
+    for (int i = 0; i < SIZE; i++) {
+        hashTable[i].name = "NULL";
+        hashTable[i].phone = -1;
+    }
+}
+
+// Hash function
+int hashFunction(const string& name) {
+    int sum = 0;
+    for (char c : name) {
+        sum += c;
+    }
+    return sum % SIZE;
+}
+
+// Insert a record using linear probing
+void insertClient(const string& name, long long phone) {
+    int index = hashFunction(name);
+    int originalIndex = index;
+    int i = 0;
+
+    // Linear probing to find an empty slot
+    while (hashTable[index].name != "NULL" && i < SIZE) {
+        index = (originalIndex + i) % SIZE;
+        i++;
+    }
+
+    if (i == SIZE) {
+        cout << "Hash Table is full! Cannot insert " << name << "." << endl;
+        return;
+    }
+
+    hashTable[index].name = name;
+    hashTable[index].phone = phone;
+    cout << "Inserted: " << name << " -> " << phone << endl;
+}
+
+// Search for a record
+void searchClient(const string& name) {
+    int index = hashFunction(name);
+    int originalIndex = index;
+    int i = 0;
+
+    while (i < SIZE) {
+        if (hashTable[index].name == name) {
+            cout << "Client Found: " << hashTable[index].name << " -> " << hashTable[index].phone << endl;
+            return;
+        }
+        index = (originalIndex + i) % SIZE;
+        i++;
+    }
+
+    cout << "Client not found: " << name << endl;
+}
+
+// Display all records
+void displayTable() {
+    cout << "\nHash Table:\n";
+    for (int i = 0; i < SIZE; i++) {
+        if (hashTable[i].name != "NULL")
+            cout << "[" << i << "] " << hashTable[i].name << " -> " << hashTable[i].phone << endl;
+        else
+            cout << "[" << i << "] --- Empty ---" << endl;
+    }
+}
+
+// Main function
+int main() {
+    initTable();
+    int choice;
+    string name;
+    long long phone;
+
+    do {
+        cout << "\n--- Telephone Book ---\n";
+        cout << "1. Insert\n2. Search\n3. Display\n4. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                cout << "Enter client name: ";
+                cin >> name;
+                cout << "Enter phone number: ";
+                cin >> phone;
+                insertClient(name, phone);
+                break;
+
+            case 2:
+                cout << "Enter client name to search: ";
+                cin >> name;
+                searchClient(name);
+                break;
+
+            case 3:
+                displayTable();
+                break;
+
+            case 4:
+                cout << "Exiting..." << endl;
+                break;
+
+            default:
+                cout << "Invalid choice!" << endl;
+        }
+    } while (choice != 4);
+
+    return 0;
+}
